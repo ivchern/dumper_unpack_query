@@ -1,0 +1,96 @@
+<!-- result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Results</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #333;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #00ff00; /* Заменил берюзовый (#00bcd4) на зеленый (#00ff00) */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #222;
+            color: #00ff00; /* Заменил берюзовый (#00bcd4) на зеленый (#00ff00) */
+        }
+
+        td {
+            background-color: #333;
+        }
+
+        .clickable-id {
+            cursor: pointer;
+            color: #00ff00; /* Заменил берюзовый (#00bcd4) на зеленый (#00ff00) */
+        }
+
+        .clickable-id:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const resultTable = document.querySelector('table');
+
+            resultTable.addEventListener('click', function(event) {
+                const targetCell = event.target.closest('.clickable-id');
+                if (targetCell) {
+                    const id = targetCell.getAttribute('data-id');
+                    const newTabLink = document.createElement('a');
+                    newTabLink.href = `/details?id=${id}&my_table=${my_table}`;
+                    newTabLink.target = '_blank';
+
+                    // Open the link in a new tab using window.open
+                    window.open(newTabLink.href, '_blank');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Query Results</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>chat_id</th>
+            <th>user_name</th>
+            <th>message</th>
+        </tr>
+        {% for row in results %}
+        <tr>
+            {% for value in [row[0], row[1], row[3], row[5]] %} <!-- Выводим только id, chat_id и message -->
+                {% if loop.index == 1 %}
+                    <td class="clickable-id" data-id="{{ value }}">
+                        <a href="/details?id={{ value }}&my_table={{ my_table }}" target="_blank">{{ value }}</a>
+                    </td>
+                {% else %}
+                    <td>{{ value }}</td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

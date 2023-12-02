@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQLite Query Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4caf50;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #555;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #777;
+            border-radius: 4px;
+            resize: vertical;
+            color: #333;
+            background-color: #fff;
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .table-list {
+            max-width: 200px;
+            background-color: #555;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            margin-right: 20px;
+        }
+
+        .table-link {
+            display: block;
+            color: #4caf50;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+        .table-list {
+            margin: 20px 0;
+        }
+
+        .upload-status {
+            color: #4caf50;
+            margin-top: 10px;
+        }
+
+        .error-status {
+            color: #f44336;
+            margin-top: 10px;
+        }
+        .table-list {
+            margin: 20px 0;
+        }
+
+        .upload-container {
+            margin-top: 20px;
+            background-color: #333;
+            padding: 20px;
+        }
+
+        .upload-status {
+            color: #4caf50;
+            margin-top: 10px;
+        }
+
+        .error-status {
+            color: #f44336;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SQLite Query Interface</h1>
+
+    <div class="table-list">
+        <h2>Tables in the Database</h2>
+        <ul>
+            {% for table in table_list %}
+                <li>{{ table }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form action="/query" method="post" enctype="multipart/form-data">
+        <label for="query">Enter SQL Query:</label>
+        <textarea name="query" rows="4" cols="50">SELECT * FROM messages WHERE message_text LIKE '%мда уж%'</textarea>
+        <br>
+        <input type="submit" value="Execute Query">
+    </form>
+
+    <div class="upload-container">
+        <h1>Upload File</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <label for="file">Select File:</label>
+            <input type="file" name="file" id="file">
+            <br>
+            <input type="submit" value="Upload File">
+        </form>
+
+        {% if upload_status %}
+            <p class="upload-status">{{ upload_status }}</p>
+        {% endif %}
+
+        {% if error_status %}
+            <p class="error-status">{{ error_status }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
