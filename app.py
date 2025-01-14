@@ -160,6 +160,29 @@ def details():
 
     return render_template('messages.html', results=[])
 
+@app.route('/search_page', methods=['GET', 'POST'])
+def search_page():
+    if request.method == 'POST':
+        search_text = request.form['search_text']
+        search_results = search_all_tables(search_text)
+        return render_template('search_page.html', search_results=search_results, search_text=search_text)
+    
+    return render_template('search_page.html', search_results=None)
+def search_all_tables(search_text):
+    tables = get_table_list()  # Получаем список всех таблиц
+    search_results = []
+
+    for table in tables:
+        query = f"SELECT * FROM {table} WHERE message_text LIKE ?"
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, (search_text,))
+            results = cursor.fetchall()
+            if results:
+                search_results.append({'table': table, 'results': results})
+
+    return search_results
+
 
 def get_table_list():
     with sqlite3.connect(DATABASE) as connection:

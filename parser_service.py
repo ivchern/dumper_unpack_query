@@ -222,12 +222,3 @@ class MessageDatabase:
     def commit_and_close(self):
         self.conn.commit()
         self.conn.close()
-
-# Пример использования
-# rar_file_path = 'DUMP.rar'
-# output_dir = 'DUMP'
-# processor = MessageFileProcessor()
-# json_data = processor.process_all_html_files(rar_file_path, output_dir)
-# db = MessageDatabase("messages.db", "dump")
-# db.insert_data(json_data)
-# db.commit_and_close()

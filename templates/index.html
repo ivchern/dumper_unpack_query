@@ -111,6 +111,8 @@
     </style>
 </head>
 <body>
+    <a href="/search_page" style="color: #4caf50; text-decoration: none; margin: 20px;">Search All Tables</a>
+
     <h1>SQLite Query Interface</h1>
 
     <div class="table-list">
@@ -124,7 +126,7 @@
 
     <form action="/query" method="post" enctype="multipart/form-data">
         <label for="query">Enter SQL Query:</label>
-        <textarea name="query" rows="4" cols="50">SELECT * FROM messages WHERE message_text LIKE '%мда уж%'</textarea>
+        <textarea name="query" rows="4" cols="50">SELECT * FROM kanaev_t WHERE message_text LIKE '%т%' AND attachment_links LIKE '%http%' LIMIT 5</textarea>
         <br>
         <input type="submit" value="Execute Query">
     </form>
