@@ -8,6 +8,8 @@ from tqdm import tqdm
 import rarfile
 import shutil
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 
 class MessageParser:
     def __init__(self):
@@ -158,29 +160,42 @@ class MessageFileProcessor(MessageProcessor):
         util = MessageParser()
         sorted_files = sorted(files, key=lambda x: (os.path.dirname(x), util.extract_number(x)))
 
-        for file_path in tqdm(sorted_files, desc="Processing files", unit="file"):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    content = file.read()
+        # Используем ThreadPoolExecutor для многопоточной обработки файлов
+        max_workers = min(256, (os.cpu_count() or 1) * 24)  # Ограничение до 32 потоков
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(self.process_file, file_path): file_path for file_path in sorted_files}
 
-                    details_chat = DetailsChat()
-                    self.details.update(details_chat.details(file_path))
-
-                    soup = BeautifulSoup(content, 'html.parser')
-                    im_in_blocks = self.get_im_in_blocks(soup)
-                    for block in im_in_blocks:
-                        self.id_msg = self.id_msg + 1
-                        details_copy = self.details.copy()
-                        details_copy.update({'id': self.id_msg})
-                        details_copy.update(self.process_block(block))
-                        self.for_append.append(details_copy)
-            except Exception as e:
-                print(f'Ошибка при обработке файла {file_path}: {e}')
+            for future in tqdm(as_completed(futures), total=len(sorted_files), desc="Processing files", unit="file"):
+                file_path = futures[future]
+                try:
+                    future.result()
+                except Exception as e:
+                    print(f'Ошибка при обработке файла {file_path}: {e}')
 
         # Удаляем временную папку после использования
         shutil.rmtree(temp_dir)
 
         return self.for_append
+
+    def process_file(self, file_path):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+
+                details_chat = DetailsChat()
+                self.details.update(details_chat.details(file_path))
+
+                soup = BeautifulSoup(content, 'html.parser')
+                im_in_blocks = self.get_im_in_blocks(soup)
+                for block in im_in_blocks:
+                    self.id_msg = self.id_msg + 1
+                    details_copy = self.details.copy()
+                    details_copy.update({'id': self.id_msg})
+                    details_copy.update(self.process_block(block))
+                    self.for_append.append(details_copy)
+        except Exception as e:
+            print(f'Ошибка при обработке файла {file_path}: {e}')
+
 class MessageDatabase:
     def __init__(self, db_name, table_name):
         self.conn = sqlite3.connect(db_name)
